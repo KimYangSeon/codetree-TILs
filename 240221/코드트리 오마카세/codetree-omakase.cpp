@@ -23,8 +23,6 @@ long long l, q;
 vector<Customer> customer;
 long long customerCnt;
 
-
-
 void Eat(long long t)
 {
     for (auto c = customer.begin(); c != customer.end(); c++)
@@ -34,16 +32,19 @@ void Eat(long long t)
 
         for (auto s = iter.first; s != iter.second && (s->second).name == c->name;)
         {
+            
             long long stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
+            if(c->t < (s->second).t) stPos = s->second.t; // 손님보다 초밥이 나중에 온 경우
             long long customerPos = c->x;  // 손님 위치
             //int curPos =  (t - (s->second).t + (s->second).x) % l; // 현재 초밥 위치 
             long long waitingTime = t - c->t; // 손님이 기다린 시간
-            long long ansTime = customerPos - stPos;
+            long long ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
             if(ansTime<0) ansTime += l;
             //if (c->x == curPos || )
             if(waitingTime >= ansTime)
             { // 초밥 먹기
                 // 초밥을 만난 경우 or 초밥을 이미 지나친 경우 
+                //cout<< t << ' ' << waitingTime << ' ' << ansTime << '\n';
                 s = sushi.erase(s);
                 c->n--;
 
@@ -84,13 +85,15 @@ void Enter(long long t, long long x, string name, long long n)
     // 위치 x로 오는 초밥들 중 자신의 name이 적힌 초밥 n개 먹고 떠남 (시각 t에 있으면 즉시 먹음)
     // 위치 x에 다른 사람은 없음
     // 초밥 먹을때 시간 소요 X
+    customerCnt++;
+
     Customer c;
     c.t = t;
     c.x = x;
     c.name = name;
     c.n = n;
     customer.push_back(c);
-    customerCnt++;
+    
     Eat(t);
 }
 
