@@ -5,27 +5,27 @@ using namespace std;
 
 struct Customer
 {
-    int t;
-    int x;
+    long long t;
+    long long x;
     string name;
-    int n;
+    long long n;
 };
 
 struct Sushi
 {
     string name;
-    int x;
-    int t;
+    long long x;
+    long long t;
 };
 
 multimap<string, Sushi> sushi;
-int l, q;
+long long l, q;
 vector<Customer> customer;
-int customerCnt;
+long long customerCnt;
 
 
 
-void Eat(int t)
+void Eat(long long t)
 {
     for (auto c = customer.begin(); c != customer.end(); c++)
     {
@@ -34,11 +34,11 @@ void Eat(int t)
 
         for (auto s = iter.first; s != iter.second && (s->second).name == c->name;)
         {
-            int stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
-            int customerPos = c->x;  // 손님 위치
+            long long stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
+            long long customerPos = c->x;  // 손님 위치
             //int curPos =  (t - (s->second).t + (s->second).x) % l; // 현재 초밥 위치 
-            int waitingTime = t - c->t; // 손님이 기다린 시간
-            int ansTime = customerPos - stPos;
+            long long waitingTime = t - c->t; // 손님이 기다린 시간
+            long long ansTime = customerPos - stPos;
             if(ansTime<0) ansTime += l;
             //if (c->x == curPos || )
             if(waitingTime >= ansTime)
@@ -61,7 +61,7 @@ void Eat(int t)
 
     }
 }
-void Cook(int t, int x, string name)
+void Cook(long long t, long long x, string name)
 {
     // 시각 t에 위치x앞에 있는 벨트에 name이 부착된 초밥을 올려놓음
     // t에 초밥 회전이 일어난 직후에 발생
@@ -75,7 +75,7 @@ void Cook(int t, int x, string name)
     Eat(t);
 }
 
-void Enter(int t, int x, string name, int n)
+void Enter(long long t, long long x, string name, long long n)
 {
     // 동일한 손님이 방문하는 경우는 없음
 
@@ -94,7 +94,7 @@ void Enter(int t, int x, string name, int n)
     Eat(t);
 }
 
-void Print(int t)
+void Print(long long t)
 {
     Eat(t);
     // 초밥 회전 -> 손님이 먹음 -> 촬영
