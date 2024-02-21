@@ -34,9 +34,16 @@ void Eat(int t)
 
         for (auto s = iter.first; s != iter.second && (s->second).name == c->name;)
         {
-            if (c->x == (t - (s->second).t + (s->second).x) % l || (c->t - t) >= l)
+            int stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
+            int customerPos = c->x;  // 손님 위치
+            //int curPos =  (t - (s->second).t + (s->second).x) % l; // 현재 초밥 위치 
+            int waitingTime = t - c->t; // 손님이 기다린 시간
+            int ansTime = customerPos - stPos;
+            if(ansTime<0) ansTime += l;
+            //if (c->x == curPos || )
+            if(waitingTime >= ansTime)
             { // 초밥 먹기
-                // 초밥을 만난 경우 or 초밥이 한바퀴 돌 동안 손님이 있던 경우
+                // 초밥을 만난 경우 or 초밥을 이미 지나친 경우 
                 s = sushi.erase(s);
                 c->n--;
 
@@ -93,12 +100,14 @@ void Print(int t)
     // 초밥 회전 -> 손님이 먹음 -> 촬영
     // 현재 사람 수와 남은 초밥 수 출력
     
-    //if(customer.size()>0) cout << customer[0].name << ' ';
     cout << customerCnt << ' ' << sushi.size() << '\n';
 }
 
 int main()
 {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
     // 여기에 코드를 작성해주세요.
     cin >> l >> q;
     for (int i = 0; i < q; i++)
