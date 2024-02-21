@@ -20,9 +20,10 @@ struct Sushi
     long long t;
 };
 
-unordered_multimap<string, Sushi> sushi;
+map<string, Customer> customer; // 이름, 손님 정보
+map<string, vector<Sushi>> sushi; // 이름, 이름의 초밥 벡터
+
 long long l, q;
-vector<Customer> customer;
 long long customerCnt;
 long long sushiCnt;
 
@@ -30,26 +31,25 @@ void Eat(long long t)
 {
     for (auto c = customer.begin(); c != customer.end(); c++)
     {
-        if (c->n == 0)
+        if (c->second.n == 0)
             continue;                           // 이미 떠난 손님
-        auto iter = sushi.equal_range(c->name); // 손님에 해당하는 초밥들 탐색
-
-        for (auto s = iter.first; s != iter.second; s++)// && (s->second).name == c->name;)
-        {
-            if(s->second.eaten) continue;
-
+        //cout << t << ' ' << sushi[c->first].size() << ' ';
+        for(Sushi &s : sushi[c->first]){ // 손님과 이름이 같은 초밥들만 탐색
+            if(s.eaten) continue;
+            //cout << "time: " <<  s.t << ' ';
             long long stPos, customerPos, waitingTime, ansTime;
-            customerPos = c->x;       // 손님 위치
-            if (c->t < (s->second).t)
+            customerPos = c->second.x;       // 손님 위치
+
+            if (c->second.t < s.t)
             { // 손님보다 초밥이 나중에 온 경우
-                stPos = (s->second).x;
-                waitingTime = t - (s->second).t;        // 손님이 기다린 시간
+                stPos = s.x;
+                waitingTime = t - s.t;        // 손님이 기다린 시간
                 ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
             }
             else
             {
-                stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
-                waitingTime = t - c->t;        // 손님이 기다린 시간
+                stPos = (c->second.t - s.t + s.x) % l; // 손님 도착 시 초밥 위치
+                waitingTime = t - c->second.t;        // 손님이 기다린 시간
                 ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
             }
 
@@ -58,33 +58,31 @@ void Eat(long long t)
 
             if (waitingTime >= ansTime)
             { // 초밥 먹기
-                s->second.eaten = true;
+                //cout << t << ' ' << s.eaten << '\n';
+                s.eaten = true;
                 sushiCnt--;
-                c->n--;
-                if (c->n == 0)
+                
+                c->second.n--;
+                if (c->second.n == 0)
                 {
                     customerCnt--;
                     break;
                 }
+                
             }
+
         }
     }
 }
 void Cook(long long t, long long x, string name)
 {
-    // 시각 t에 위치x앞에 있는 벨트에 name이 부착된 초밥을 올려놓음
-    // t에 초밥 회전이 일어난 직후에 발생
-    // 같은 위치에 여러 초밥이 올라갈 수 있음
-    // 같은 name의 초밥이 같은 위치에 올라갈 수 있음
     sushiCnt++;
-
     Sushi s;
     s.name = name;
     s.x = x;
     s.t = t;
     s.eaten = false;
-    sushi.insert({name, s});
-    //Eat(t);
+    sushi[name].push_back(s);
 }
 
 void Enter(long long t, long long x, string name, long long n)
@@ -102,18 +100,14 @@ void Enter(long long t, long long x, string name, long long n)
     c.x = x;
     c.name = name;
     c.n = n;
-    customer.push_back(c);
-
-   // Eat(t);
+    customer[name] = c;
 }
 
 void Print(long long t)
 {
     Eat(t);
-    // 초밥 회전 -> 손님이 먹음 -> 촬영
-    // 현재 사람 수와 남은 초밥 수 출력
 
-    cout << customerCnt << ' ' << sushiCnt<< '\n';
+    cout << customerCnt << ' ' << sushiCnt << '\n';
 }
 
 int main()
