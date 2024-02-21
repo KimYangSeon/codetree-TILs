@@ -27,24 +27,39 @@ void Eat(long long t)
 {
     for (auto c = customer.begin(); c != customer.end(); c++)
     {
-        if (c->n == 0) continue; // 이미 떠난 손님
+        if (c->n == 0)
+            continue;                           // 이미 떠난 손님
         auto iter = sushi.equal_range(c->name); // 손님에 해당하는 초밥들 탐색
 
         for (auto s = iter.first; s != iter.second && (s->second).name == c->name;)
         {
+            long long stPos, customerPos, waitingTime, ansTime;
+            customerPos = c->x;       // 손님 위치
+            if (c->t < (s->second).t)
+            { // 손님보다 초밥이 나중에 온 경우
+                //cout << t << "?";
+                stPos = (s->second).x;
+                //stPos -= (c->t - (s->second).t);
+                waitingTime = t - (s->second).t;        // 손님이 기다린 시간
+                ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
+                //cout << waitingTime << ' ' << ansTime << '\n';
+            }
+            else
+            {
+                stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
+                waitingTime = t - c->t;        // 손님이 기다린 시간
+                ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
+            }
             
-            long long stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
-            if(c->t < (s->second).t) stPos = s->second.t; // 손님보다 초밥이 나중에 온 경우
-            long long customerPos = c->x;  // 손님 위치
-            //int curPos =  (t - (s->second).t + (s->second).x) % l; // 현재 초밥 위치 
-            long long waitingTime = t - c->t; // 손님이 기다린 시간
-            long long ansTime = customerPos - stPos; // 초밥이 손님 앞까지 걸리는 시간
-            if(ansTime<0) ansTime += l;
-            //if (c->x == curPos || )
-            if(waitingTime >= ansTime)
+            //stPos = (c->t - (s->second).t + (s->second).x) % l; // 손님 도착 시 초밥 위치
+            
+            if (ansTime < 0)
+                ansTime += l;
+
+            if (waitingTime >= ansTime)
             { // 초밥 먹기
-                // 초밥을 만난 경우 or 초밥을 이미 지나친 경우 
-                //cout<< t << ' ' << waitingTime << ' ' << ansTime << '\n';
+                // 초밥을 만난 경우 or 초밥을 이미 지나친 경우
+                // cout<< t << ' ' << waitingTime << ' ' << ansTime << '\n';
                 s = sushi.erase(s);
                 c->n--;
 
@@ -59,7 +74,6 @@ void Eat(long long t)
                 s++;
             }
         }
-
     }
 }
 void Cook(long long t, long long x, string name)
@@ -73,7 +87,7 @@ void Cook(long long t, long long x, string name)
     s.x = x;
     s.t = t;
     sushi.insert({name, s});
-    Eat(t);
+    //Eat(t);
 }
 
 void Enter(long long t, long long x, string name, long long n)
@@ -93,8 +107,8 @@ void Enter(long long t, long long x, string name, long long n)
     c.name = name;
     c.n = n;
     customer.push_back(c);
-    
-    Eat(t);
+
+   // Eat(t);
 }
 
 void Print(long long t)
@@ -102,7 +116,7 @@ void Print(long long t)
     Eat(t);
     // 초밥 회전 -> 손님이 먹음 -> 촬영
     // 현재 사람 수와 남은 초밥 수 출력
-    
+
     cout << customerCnt << ' ' << sushi.size() << '\n';
 }
 
