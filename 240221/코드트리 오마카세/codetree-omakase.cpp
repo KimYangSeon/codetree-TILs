@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <unordered_map>
 using namespace std;
 
 struct Customer
@@ -19,7 +20,7 @@ struct Sushi
     long long t;
 };
 
-multimap<string, Sushi> sushi;
+unordered_multimap<string, Sushi> sushi;
 long long l, q;
 vector<Customer> customer;
 long long customerCnt;
