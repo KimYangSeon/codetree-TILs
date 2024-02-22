@@ -59,7 +59,7 @@ void SelectAttacker()
     }
 
     board[attacker.X][attacker.Y] += (n + m);
-    // cout<< "attacker: "  << attacker.X << ' ' << attacker.Y << '\n';
+    //cout<< "attacker: "  << attacker.X << ' ' << attacker.Y << '\n';
 }
 
 void SelectTarget()
@@ -107,11 +107,12 @@ void SelectTarget()
         }
     }
 
-    // cout << "target: " << target.X << ' ' << target.Y << '\n';
+    //cout << "target: " << target.X << ' ' << target.Y << '\n';
 }
 
 void Attack(int x, int y, int damage)
 {
+    //cout << "damaged: " << x << ' ' << y << '\n';
     attackedTime[x][y]=t;
     board[x][y] -= damage;
     if (board[x][y] < 0)
@@ -135,6 +136,7 @@ void Bomb()
             int tempY = (j+m)%m;
 
             if(attacker.X == tempX && attacker.Y == tempY) continue;
+            if(board[tempX][tempY]<=0) continue;
             if(tempX == x && tempY == y){ // 목표
                 Attack(tempX,tempY,board[attacker.X][attacker.Y]);
             }
@@ -227,10 +229,14 @@ void Simulation()
     // 목표 선정
     SelectTarget();
 
+    
+
     // 레이저 공격(포탑 공격)
     Laser();
     // 포탑 정비
     // 공격자 아님 & 아무 피해도 입지 않은 포탑은 공격력이 1상승
+
+
 
     for(int i=0; i<n; i++){
         for(int j=0; j<m; j++){
@@ -239,6 +245,13 @@ void Simulation()
             }
         }
     }
+    /*
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            cout << board[i][j] << ' ';
+        }
+        cout << '\n';
+    }*/
 }
 
 int main()
