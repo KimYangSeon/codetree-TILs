@@ -59,6 +59,8 @@ void SelectAttacker()
     }
 
     board[attacker.X][attacker.Y] += (n + m);
+    attackTime[attacker.X][attacker.Y] = t; // 공격 시간 갱신
+
     //cout<< "attacker: "  << attacker.X << ' ' << attacker.Y << '\n';
 }
 
@@ -115,7 +117,7 @@ void Attack(int x, int y, int damage)
     //cout << "damaged: " << x << ' ' << y << '\n';
     attackedTime[x][y]=t;
     board[x][y] -= damage;
-    if (board[x][y] < 0)
+    if (board[x][y] <= 0)
     {
         board[x][y] = 0;
         aliveCnt--;
@@ -156,7 +158,7 @@ void Laser()
     // 가장자리에서 막힌 방향으로 진행하고자 한다면, 반대편으로 나옵니다
 
     queue<pair<int, int>> q;
-    attackTime[attacker.X][attacker.Y] = t; // 공격 시간 갱신
+    
     vis[attacker.X][attacker.Y] = t;        // 현재 공격 시간 방문 여부 표시
 
     q.push({attacker.X, attacker.Y});
@@ -219,9 +221,7 @@ void Laser()
 
 void Simulation()
 {
-    // 포탑이 1개가 되면 즉시 중지
-    if (aliveCnt <= 1)
-        return; // 공격중일때도?
+    
 
     //  공격자 선정
     SelectAttacker();
@@ -236,8 +236,6 @@ void Simulation()
     // 포탑 정비
     // 공격자 아님 & 아무 피해도 입지 않은 포탑은 공격력이 1상승
 
-
-
     for(int i=0; i<n; i++){
         for(int j=0; j<m; j++){
             if(attackedTime[i][j] != t && !(i==attacker.X && j==attacker.Y) && board[i][j]>0){
@@ -245,6 +243,7 @@ void Simulation()
             }
         }
     }
+    
     /*
     for(int i=0; i<n; i++){
         for(int j=0; j<m; j++){
@@ -272,6 +271,8 @@ int main()
 
     while (k--)
     {
+        if(aliveCnt<2) break;
+
         t++;
         Simulation();
     }
