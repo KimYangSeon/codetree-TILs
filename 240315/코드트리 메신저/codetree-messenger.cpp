@@ -37,9 +37,6 @@ void Change(int c)
             for (int i = depth; i <= 20; i++)
             {
                 cnt[cur] += upcnt[c][i];
-                if(cur==1){
-                    //cout << c << ' ' << i << ' ' << cnt[cur] << '\n';
-                }
                 if (i - depth > 0)
                     upcnt[cur][i - depth] += upcnt[c][i];
             }
@@ -89,7 +86,8 @@ void ChangeAutority(int c, int power)
     upcnt[c][power]++;
     int cur = c;
     int depth = 1;
-    while (parents[cur] != 0)
+    if(isOff[cur]) return;
+    while (parents[cur] != 0 && !isOff[parents[cur]])
     {
         cur = parents[cur];
         if (a - depth > 0 && upcnt[cur][a - depth] > 0)
