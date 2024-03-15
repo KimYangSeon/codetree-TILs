@@ -87,9 +87,10 @@ void ChangeAutority(int c, int power)
     int cur = c;
     int depth = 1;
     if(isOff[cur]) return;
-    while (parents[cur] != 0 && !isOff[parents[cur]])
+    while (parents[cur] != 0)
     {
         cur = parents[cur];
+        if(isOff[cur]) break;
         if (a - depth > 0 && upcnt[cur][a - depth] > 0)
         {
             upcnt[cur][a - depth]--;
