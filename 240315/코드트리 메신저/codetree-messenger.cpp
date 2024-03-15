@@ -84,43 +84,34 @@ void ChangeAutority(int c, int power)
     authority[c] = power;
     
     upcnt[c][a]--;
+    upcnt[c][power]++;
     
-    if (isOff[c]){
-        upcnt[c][power]++;
+    if (isOff[c])
         return;
-    }
+    
 
     int cur = parents[c];
     int depth = 1;
 
     while (cur != 0)
     {
-        
         if (a - depth >= 0)
             cnt[cur]--;
         if (a - depth > 0)
             upcnt[cur][a - depth]--;
-        if (isOff[cur])
-            break;
-
-        depth++;
-        cur = parents[cur];
-    }
-
-    upcnt[c][power]++;
-    cur = parents[c];
-    depth=1;
-    while (cur != 0)
-    {
         if (power - depth >= 0)
             cnt[cur]++;
         if (power - depth > 0)
             upcnt[cur][power - depth]++;
         if (isOff[cur])
             break;
+
         depth++;
         cur = parents[cur];
     }
+
+    
+
 }
 
 void ChangeParent(int c1, int c2)
