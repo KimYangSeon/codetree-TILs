@@ -75,36 +75,52 @@ void Change(int c)
     */
 }
 
-void ChangeAutority(int chat, int power)
+void ChangeAutority(int c, int power)
 {
-    int bef_power = authority[chat];
-    power = min(power, 20);  
-    authority[chat] = power;
+    //  c번 채팅방의 권한 세기를 power로 변경
+    if (power > 20)
+        power = 20;
+    int a = authority[c];
+    authority[c] = power;
+    
+    upcnt[c][a]--;
+    int cur = parents[c];
+    int depth = 1;
+    if (isOff[c]){
+        upcnt[c][power]++;
+        return;
+    }
+        
+    while (cur != 0)
+    {
+        if (isOff[cur])
+            break;
 
-    upcnt[chat][bef_power]--;
-    if(!isOff[chat]) {
-        int cur = parents[chat];
-        int num = 1;
-        while(cur) {
-            if(bef_power >= num) cnt[cur]--;
-            if(bef_power > num) upcnt[cur][bef_power - num]--;
-            if(isOff[cur]) break;
-            cur = parents[cur];
-            num++;
-        }
+        if (a - depth >= 0)
+            cnt[cur]--;
+        if (a - depth > 0)
+            upcnt[cur][a - depth]--;
+
+        depth++;
+        cur = parents[cur];
     }
 
-    upcnt[chat][power]++;
-    if(!isOff[chat]) {
-        int cur = parents[chat];
-        int num = 1;
-        while(cur) {
-            if(power >= num) cnt[cur]++;
-            if(power > num) upcnt[cur][power - num]++;
-            if(isOff[cur]) break;
-            cur = parents[cur];
-            num++;
-        }
+    upcnt[c][power]++;
+    cur = parents[c];
+    depth=1;
+    while (cur != 0)
+    {
+        
+        if (isOff[cur])
+            break;
+
+        if (power - depth >= 0)
+            cnt[cur]++;
+        if (power - depth > 0)
+            upcnt[cur][power - depth]++;
+
+        depth++;
+        cur = parents[cur];
     }
 }
 
