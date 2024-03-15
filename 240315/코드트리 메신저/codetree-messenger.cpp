@@ -34,11 +34,14 @@ void Change(int c)
         int depth = 1;
         while (cur != 0)
         {
-            for (int i = 1; i <= 20; i++)
+            for (int i = depth; i <= 20; i++)
             {
                 cnt[cur] += upcnt[c][i];
-                if (i + depth <= 20)
-                    upcnt[cur][i] += upcnt[c][i + depth];
+                if(cur==1){
+                    //cout << c << ' ' << i << ' ' << cnt[cur] << '\n';
+                }
+                if (i - depth > 0)
+                    upcnt[cur][i - depth] += upcnt[c][i];
             }
             if (isOff[cur])
                 break;
@@ -52,11 +55,11 @@ void Change(int c)
         int depth = 1;
         while (cur != 0)
         {
-            for (int i = 1; i <= 20; i++)
+            for (int i = depth; i <= 20; i++)
             {
                 cnt[cur] -= upcnt[c][i];
-                if (i + depth <= 20)
-                    upcnt[cur][i] -= upcnt[c][i + depth];
+                if (i - depth > 0)
+                    upcnt[cur][i - depth] -= upcnt[c][i];
             }
             if (isOff[cur])
                 break;
@@ -71,7 +74,8 @@ void Change(int c)
         for(int j=1; j<=20; j++){
             if(upcnt[i][j]>0) cout << i << ' ' << j << ' '<< upcnt[i][j] << '\n';
         }
-    }*/
+    }
+    */
 }
 
 void ChangeAutority(int c, int power)
@@ -108,20 +112,21 @@ void ChangeParent(int c1, int c2)
     bool before_isOff1 = isOff[c1];
     bool before_isOff2 = isOff[c2];
 
-    if(!isOff[c1]) Change(c1);
-    if(!isOff[c2]) Change(c2);
+    if (!isOff[c1])
+        Change(c1);
+    if (!isOff[c2])
+        Change(c2);
 
     swap(parents[c1], parents[c2]);
 
-    if(!before_isOff1) Change(c1);
-    if(!before_isOff1) Change(c2);
-
+    if (!before_isOff1)
+        Change(c1);
+    if (!before_isOff2)
+        Change(c2);
 }
 
 void Print(int c)
 {
-    // c번 채팅방까지 알림이 도달할 수 있는 채팅방의 수 출력
-    // c번 채팅방은 제외하고 세어야 함
     cout << cnt[c] << '\n';
 }
 
