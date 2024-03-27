@@ -20,8 +20,12 @@ void request(int t, int p, string url) // 200 큐에 추가
 {
     if (readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
         return;
+    int idx = 0;
+    while(url[idx] != '\0'){
+        if(url[idx] == '/') break;
+        idx++;
+    }
 
-    int idx = url.find('/');
     string d = url.substr(0, idx);
     int id = stoi(url.substr(idx + 1));
 
