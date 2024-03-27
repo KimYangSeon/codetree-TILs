@@ -71,6 +71,7 @@ void tryGrade(int t) // 300 채점 시도
             id = r.second.second;
             url = d + '/' + to_string(id);
             minP = p;
+            minT = get<1>(readyDomain[d].top());
             is_find = true;
         }
     }
