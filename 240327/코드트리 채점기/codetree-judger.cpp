@@ -1,17 +1,17 @@
 #include <iostream>
 #include <queue>
-#include <set>
+#include <unordered_set>
+#include <unordered_map>
 #include <tuple>
 #include <stack>
-#include <map>
 using namespace std;
 
 int q, n, cnt;
 string machine_to_url[50001];
 vector<int> grading_machine;
-set<string> readyUrl;
-set<string> gradingUrl;
-map<string, pair<int, int>> endMap;
+unordered_set<string> readyUrl;
+unordered_set<string> gradingUrl;
+unordered_map<string, pair<int, int>> endMap;
 priority_queue<int, vector<int>, greater<int>> machine_pq;
 priority_queue<tuple<int, int, string>, vector<tuple<int, int, string>>, greater<tuple<int, int, string>>> pq;
 
