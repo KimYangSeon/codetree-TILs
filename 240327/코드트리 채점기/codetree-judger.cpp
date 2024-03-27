@@ -19,7 +19,7 @@ void request(int t, int p, string url) // 200 큐에 추가
 {
     if (readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
         return;
-    string d = url.substr(0, url.find('/') + 1);
+    string d = url.substr(0, url.find('/'));
     int id = stoi(url.substr(url.find('/') + 1));
 
     cnt++;
@@ -27,7 +27,6 @@ void request(int t, int p, string url) // 200 큐에 추가
     readyDomain[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
     tie(p, t, id) = readyDomain[d].top();
     readyQueue[d] = { p, id }; // 우선순위가 높다면 레디큐 갱신
-
 }
 
 void init(string u0)
@@ -68,7 +67,7 @@ void tryGrade(int t) // 300 채점 시도
         if (minP > p || (minP == p && minT > get<1>(readyDomain[d].top())))
         {
             id = r.second.second;
-            url = d + to_string(id);
+            url = d + '/' + to_string(id);
             minP = p;
             is_find = true;
         }
