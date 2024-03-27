@@ -1,7 +1,8 @@
 #include <iostream>
 #include <queue>
-#include <set>
-#include <map>
+#include <unordered_set>
+#include <unordered_map>
+
 #include <tuple>
 using namespace std;
 
@@ -9,12 +10,10 @@ int q, n, cnt;
 string machine_to_url[50001];
 bool machineStat[50001];
 vector<int> grading_machine;
-set<string> gradingUrl;
-set<string> readyUrl;                   
+unordered_set<string> readyUrl;                   
 priority_queue<int, vector<int>, greater<int>> machine_pq;
-map<string, pair<int, int>> endMap;
-map<string, pair<int, int>> readyQueue; // 도메인, {우선순위, id}
-map<string, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyDomain;
+unordered_map<string, pair<int, int>> endMap;
+unordered_map<string, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyQueue;
 
 void request(int t, int p, string url) // 200 큐에 추가
 {
@@ -27,9 +26,7 @@ void request(int t, int p, string url) // 200 큐에 추가
 
     cnt++;
     readyUrl.insert(url);
-    readyDomain[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
-    tie(p, t, id) = readyDomain[d].top();
-    readyQueue[d] = {p, id}; // 우선순위가 높다면 레디큐 갱신
+    readyQueue[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
 }
 
 void init(string url)
@@ -53,26 +50,20 @@ void tryGrade(int t) // 300 채점 시도
     int id;
     string url, d;
 
-    
     for (auto r : readyQueue)
     { // 우선순위가 높은 task 찾기
-        
+        if(r.second.empty()) continue;
         string cur_d = r.first;
-        int cur_p = r.second.first;
-        int cur_id = r.second.second;
-        
-        if(readyDomain[cur_d].empty()) continue;
-        if (!gradingUrl.empty() && gradingUrl.find(cur_d) != gradingUrl.end())
-            continue; // 채점중인 도메인
+        int cur_p, cur_t, cur_id;
+        tie(cur_p, cur_t, cur_id) = r.second.top();
+
         if (!endMap.empty() && endMap.find(cur_d) != endMap.end())
         {
             int st = endMap[cur_d].first;
             int en = endMap[cur_d].second;
-            if (t < st + 3 * (en - st))
+            if (en == -1 || t < st + 3 * (en - st))
                 continue; // 부적절한 채점
         }
-
-        int cur_t = get<1>(readyDomain[cur_d].top());
 
         if (minP > cur_p || (minP == cur_p && minT > cur_t))
         {
@@ -88,11 +79,7 @@ void tryGrade(int t) // 300 채점 시도
     if (is_find)
     { // 채점 시작
         readyUrl.erase(url);
-        readyQueue.erase(d);
-        readyDomain[d].pop();
-        gradingUrl.insert(d);
-        if (!readyDomain.empty())
-            readyQueue[d] = {get<0>(readyDomain[d].top()), id}; // 도메인의 다음 우선순위에 해당하는 task의 {우선순위, id} 저장
+        readyQueue[d].pop();
         endMap[d] = {t, -1};
         machine_to_url[machine_pq.top()] = d;
         machineStat[machine_pq.top()] = true;
@@ -108,7 +95,6 @@ void endGrade(int t, int id)
 
     machineStat[id] = false;
     string d = machine_to_url[id];
-    gradingUrl.erase(d);
     endMap[d].second = t;
     machine_pq.push(id);
 }
