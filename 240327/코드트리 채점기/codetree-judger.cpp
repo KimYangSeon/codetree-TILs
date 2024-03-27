@@ -69,7 +69,7 @@ void tryGrade(int t) // 300 채점 시도
         {
             id = r.second.second;
             url = d + to_string(id);
-            minP = r.second.first;
+            minP = p;
             is_find = true;
         }
     }
@@ -79,8 +79,8 @@ void tryGrade(int t) // 300 채점 시도
         //cout << url << '\n';
         readyUrl.erase(url);
         readyQueue.erase(d);
-        gradingUrl.insert(d);
         readyDomain[d].pop();
+        gradingUrl.insert(d);
         if(!readyDomain.empty()) readyQueue[d] = {get<0>(readyDomain[d].top()), id}; // 도메인의 다음 우선순위에 해당하는 task의 {우선순위, id} 저장
         endMap[d] = {t, -1};
         machine_to_url[machine_pq.top()] = d;
