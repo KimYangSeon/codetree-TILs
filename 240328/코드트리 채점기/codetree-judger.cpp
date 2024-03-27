@@ -1,31 +1,40 @@
 #include <iostream>
 #include <queue>
 #include <set>
-#include <unordered_map>
-
+#include <map>
 #include <tuple>
 using namespace std;
 
-int q, n, cnt;
-string machine_to_url[50001];
+int q, n, domainCnt, ans;
+int machine_to_domainIdx[50001];
 bool machineStat[50001];
-set<string> readyUrl;                   
+//set<string> readyUrl;    
+set<int> readyDomain[50001]; // readyDomain[도메인idx].insert(id)   
+int en[50001];
+int st[50001];
 priority_queue<int, vector<int>, greater<int>> machine_pq;
-unordered_map<string, pair<int, int>> endMap;
-unordered_map<string, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyQueue;
+// 도메인별 우선순위 큐
+map<int, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyQueue;
+map<string, int> domainToIdx; // 도메인 문자열 -> int로 변환
+set<int> domains[50001]; // 도메인별로 관리
+
 
 void request(int t, int p, string url) // 200 큐에 추가
 {
-    if (readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
-        return;
-
     int idx = url.find('/');
     string d = url.substr(0, idx);
     int id = stoi(url.substr(idx + 1));
 
-    cnt++;
-    readyUrl.insert(url);
-    readyQueue[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
+    if(!domainToIdx[d]){ // 처음 나온 도메인
+        domainCnt++;
+        domainToIdx[d] = domainCnt;
+    }
+    int domainIdx = domainToIdx[d];
+
+    if(readyDomain[domainIdx].find(id) != readyDomain[domainIdx].end()) return; // 이미 존재하는 url
+    readyDomain[domainIdx].insert(id);
+    readyQueue[domainIdx].push({p, t, id});
+    ans++;
 }
 
 void init(string url)
@@ -37,53 +46,51 @@ void init(string url)
 
 void tryGrade(int t) // 300 채점 시도
 {
-    if (cnt == 0)
+    if (ans == 0) // 채점 가능한 task가 없음
         return;
     if (machine_pq.empty())
-        return; // 채점기 없으면 채점 X
+        return; // 채점기 없음
 
     bool is_find = false;
 
     int minP = n+1;
     int minT = 1000001;
-    int id;
-    string url, d;
+    int id, domainIdx;
 
     for (auto r : readyQueue)
     { // 우선순위가 높은 task 찾기
-        if(r.second.empty()) continue;
-        string cur_d = r.first;
+
+        //string cur_d = r;
+        int curDomainIdx = r.first;
         int cur_p, cur_t, cur_id;
         tie(cur_p, cur_t, cur_id) = r.second.top();
 
-        if (!endMap.empty() && endMap.find(cur_d) != endMap.end())
-        {
-            int st = endMap[cur_d].first;
-            int en = endMap[cur_d].second;
-            if (en == -1 || t < st + 3 * (en - st))
-                continue; // 부적절한 채점
-        }
+        // 부적절한 채점
+        if(en[curDomainIdx] == -1 ||  t < st[curDomainIdx] + 3 * (en[curDomainIdx] - st[curDomainIdx])) continue;
 
         if (minP > cur_p || (minP == cur_p && minT > cur_t))
         {
-            d = cur_d;
+            domainIdx = curDomainIdx;
             id = cur_id;
             minP = cur_p;
             minT = cur_t;
-            url = d + '/' + to_string(id);
+            //url = d + '/' + to_string(id);
             is_find = true;
         }
     }
 
     if (is_find)
     { // 채점 시작
-        readyUrl.erase(url);
-        readyQueue[d].pop();
-        endMap[d] = {t, -1};
-        machine_to_url[machine_pq.top()] = d;
+        readyDomain[domainIdx].erase(id);
+        readyQueue[domainIdx].pop();
+        if(readyQueue[domainIdx].empty()) readyQueue.erase(domainIdx);
+        //endMap[d] = {t, -1};
+        st[domainIdx] = t;
+        en[domainIdx] = -1;
+        machine_to_domainIdx[machine_pq.top()] = domainIdx;
         machineStat[machine_pq.top()] = true;
         machine_pq.pop();
-        cnt--;
+        ans--;
     }
 }
 
@@ -93,14 +100,14 @@ void endGrade(int t, int id)
         return;
 
     machineStat[id] = false;
-    string d = machine_to_url[id];
-    endMap[d].second = t;
+    int domainIdx = machine_to_domainIdx[id];
+    en[domainIdx] = t;
     machine_pq.push(id);
 }
 
 void printInfo(int t)
 {
-    cout << cnt << '\n';
+    cout << ans << '\n';
 }
 
 int main()
