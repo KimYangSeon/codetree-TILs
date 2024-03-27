@@ -98,9 +98,8 @@ void endGrade(int t, int id) // 400 채점 끝
 {
     // id번 채점기의 채점 종료
     if(id>n || !machineStat[id]) return;
-
+    machineStat[id] = false;
     string url = machine_to_url[id];
-    machine_to_url[id] = "";
     gradingUrl.erase(url);
 
     endMap[url].second = t;
