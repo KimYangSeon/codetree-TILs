@@ -1,6 +1,6 @@
 #include <iostream>
 #include <queue>
-#include <unordered_set>
+#include <set>
 #include <unordered_map>
 
 #include <tuple>
@@ -9,15 +9,14 @@ using namespace std;
 int q, n, cnt;
 string machine_to_url[50001];
 bool machineStat[50001];
-vector<int> grading_machine;
-unordered_set<string> readyUrl;                   
+set<string> readyUrl;                   
 priority_queue<int, vector<int>, greater<int>> machine_pq;
 unordered_map<string, pair<int, int>> endMap;
 unordered_map<string, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyQueue;
 
 void request(int t, int p, string url) // 200 큐에 추가
 {
-    if (!readyUrl.empty() && readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
+    if (readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
         return;
 
     int idx = url.find('/');
