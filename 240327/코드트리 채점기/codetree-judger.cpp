@@ -27,6 +27,7 @@ void request(int t, int p, string url) // 200 큐에 추가
     readyDomain[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
     tie(p, t, id) = readyDomain[d].top();
     readyQueue[d] = { p, id }; // 우선순위가 높다면 레디큐 갱신
+
 }
 
 void init(string u0)
@@ -38,9 +39,6 @@ void init(string u0)
 
 void tryGrade(int t) // 300 채점 시도
 {
-    // t초에 큐에서 우선순위가 높은 거 채점(우선순위 숫자가 작은거 & 큐에 먼저 온거)
-    // 현재 채점중인 도메인이면 채점 X
-
     if (cnt == 0)
         return;
     if (machine_pq.empty())
@@ -50,12 +48,13 @@ void tryGrade(int t) // 300 채점 시도
 
     int minP = 50001;
     int minT = 50001;
-    int id;
+    int id,p;
     string url;
     string d;
     for (auto r : readyQueue)
     { // 우선순위가 높은 task 찾기
         d = r.first;
+        p = r.second.first;
         if (gradingUrl.find(d) != gradingUrl.end())
             continue; // 채점중인 도메인
         if (endMap.find(d) != endMap.end())
@@ -66,10 +65,10 @@ void tryGrade(int t) // 300 채점 시도
                 continue; // 부적절한 채점
         }
 
-        if (minP > r.second.first || (minP == r.second.first && minT > get<1>(readyDomain[d].top())))
+        if (minP > p || (minP == p && minT > get<1>(readyDomain[d].top())))
         {
             id = r.second.second;
-            url = d +  to_string(id);
+            url = d + to_string(id);
             minP = r.second.first;
             is_find = true;
         }
@@ -82,7 +81,7 @@ void tryGrade(int t) // 300 채점 시도
         readyQueue.erase(d);
         gradingUrl.insert(d);
         readyDomain[d].pop();
-        readyQueue[d] = {get<0>(readyDomain[d].top()), id}; // 도메인의 다음 우선순위에 해당하는 task의 {우선순위, id} 저장
+        if(!readyDomain.empty()) readyQueue[d] = {get<0>(readyDomain[d].top()), id}; // 도메인의 다음 우선순위에 해당하는 task의 {우선순위, id} 저장
         endMap[d] = {t, -1};
         machine_to_url[machine_pq.top()] = d;
         machine_pq.pop();
