@@ -7,6 +7,7 @@ using namespace std;
 
 int q, n, cnt;
 string machine_to_url[50001];
+bool machineStat[50001];
 vector<int> grading_machine;
 unordered_set<string> gradingUrl;
 priority_queue<int, vector<int>, greater<int>> machine_pq;
@@ -79,6 +80,7 @@ void tryGrade(int t) // 300 채점 시도
     if (is_find)
     { // 채점 시작
         //cout << url << '\n';
+       
         readyUrl.erase(url);
         readyQueue.erase(d);
         readyDomain[d].pop();
@@ -86,6 +88,7 @@ void tryGrade(int t) // 300 채점 시도
         if(!readyDomain.empty()) readyQueue[d] = {get<0>(readyDomain[d].top()), id}; // 도메인의 다음 우선순위에 해당하는 task의 {우선순위, id} 저장
         endMap[d] = {t, -1};
         machine_to_url[machine_pq.top()] = d;
+        machineStat[machine_pq.top()] = true;
         machine_pq.pop();
         cnt--;
     }
@@ -94,7 +97,7 @@ void tryGrade(int t) // 300 채점 시도
 void endGrade(int t, int id) // 400 채점 끝
 {
     // id번 채점기의 채점 종료
-    if(machine_to_url[id].length()<=0) return;
+    if(id>n || !machineStat[id]) return;
 
     string url = machine_to_url[id];
     machine_to_url[id] = "";
