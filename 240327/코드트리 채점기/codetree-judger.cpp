@@ -94,7 +94,10 @@ void tryGrade(int t) // 300 채점 시도
 void endGrade(int t, int id) // 400 채점 끝
 {
     // id번 채점기의 채점 종료
+    if(machine_to_url[id].length()<=0) return;
+
     string url = machine_to_url[id];
+    machine_to_url[id] = "";
     gradingUrl.erase(url);
 
     endMap[url].second = t;
