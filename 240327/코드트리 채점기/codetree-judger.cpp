@@ -13,7 +13,7 @@ unordered_set<string> gradingUrl;
 priority_queue<int, vector<int>, greater<int>> machine_pq;
 unordered_map<string, pair<int, int>> endMap;
 unordered_map<string, pair<int, int>> readyQueue; // 도메인, {우선순위, id}
-unordered_map<string, int> readyUrl;              // url, id
+unordered_set<string> readyUrl;              // url
 unordered_map<string, priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>>> readyDomain;
 
 void request(int t, int p, string url) // 200 큐에 추가
@@ -26,7 +26,7 @@ void request(int t, int p, string url) // 200 큐에 추가
     int id = stoi(url.substr(idx + 1));
     
     cnt++;
-    readyUrl[url] = id;
+    readyUrl.insert(url);
     readyDomain[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
     tie(p, t, id) = readyDomain[d].top();
     readyQueue[d] = { p, id }; // 우선순위가 높다면 레디큐 갱신
@@ -98,11 +98,11 @@ void endGrade(int t, int id) // 400 채점 끝
 {
     // id번 채점기의 채점 종료
     if(id>n || !machineStat[id]) return;
-    machineStat[id] = false;
-    string url = machine_to_url[id];
-    gradingUrl.erase(url);
 
-    endMap[url].second = t;
+    machineStat[id] = false;
+    string d = machine_to_url[id];
+    gradingUrl.erase(d);
+    endMap[d].second = t;
     machine_pq.push(id);
 }
 
@@ -131,9 +131,9 @@ int main()
         }
         else if (query == 200)
         {
-            string u;
-            cin >> t >> p >> u;
-            request(t, p, u);
+            string url;
+            cin >> t >> p >> url;
+            request(t, p, url);
         }
         else if (query == 300)
         {
