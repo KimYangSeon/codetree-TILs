@@ -6,7 +6,7 @@
 #include <map>
 using namespace std;
 
-int q, n, cnt, minIdx;
+int q, n, cnt;
 string machine_to_url[50001];
 vector<int> grading_machine;
 set<string> readyUrl;
@@ -14,18 +14,15 @@ set<string> gradingUrl;
 map<string, pair<int, int>> endMap;
 priority_queue<int, vector<int>, greater<int>> machine_pq;
 priority_queue<tuple<int, int, string>, vector<tuple<int, int, string>>, greater<tuple<int, int, string>>> pq;
+
 // 우선순위, 들어온 시간, url
 
 void request(int t, int p, string u) // 200 큐에 추가
 {
-    if (readyUrl.find(u) != readyUrl.end()){
-       // cout << "exist: " << u << '\n';
-        return;
-    }
-        
+    if (readyUrl.find(u) != readyUrl.end()) return;
+
     cnt++;
     readyUrl.insert(u);
-    //pq.push({p, t, u.substr(0, u.find('/'))});
     pq.push({p, t, u});
 }
 
@@ -47,11 +44,16 @@ void tryGrade(int t) // 300 채점 시도
 
     stack<tuple<int, int, string>> temp;
     bool is_find = false;
+
+    auto cur = pq.top();
+    string url;
+    string u;
+
     while (!pq.empty() && !is_find)
     {
-        auto cur = pq.top();
-        string url = get<2>(cur);
-        string u = url.substr(0, url.find('/'));
+        cur = pq.top();
+        url = get<2>(cur);
+        u = url.substr(0, url.find('/'));
         if (gradingUrl.find(u) != gradingUrl.end())
         { // 현재 채점중임
             temp.push(cur);
@@ -73,10 +75,7 @@ void tryGrade(int t) // 300 채점 시도
     }
 
     if (is_find)
-    {
-        auto cur = pq.top();
-        string url = get<2>(cur);
-        string u = url.substr(0, url.find('/'));
+    {   // 채점 시작
         readyUrl.erase(url);
         gradingUrl.insert(u);
         endMap[u] = {t, -1};
