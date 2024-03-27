@@ -19,9 +19,11 @@ void request(int t, int p, string url) // 200 큐에 추가
 {
     if (readyUrl.find(url) != readyUrl.end()) // url이 큐에 존재
         return;
-    string d = url.substr(0, url.find('/'));
-    int id = stoi(url.substr(url.find('/') + 1));
 
+    int idx = url.find('/');
+    string d = url.substr(0, idx);
+    int id = stoi(url.substr(idx + 1));
+    
     cnt++;
     readyUrl[url] = id;
     readyDomain[d].push({p, t, id}); // 도메인을 기준으로 우선순위, 시간, id 저장
@@ -29,11 +31,11 @@ void request(int t, int p, string url) // 200 큐에 추가
     readyQueue[d] = { p, id }; // 우선순위가 높다면 레디큐 갱신
 }
 
-void init(string u0)
+void init(string url)
 {
     for (int i = 1; i <= n; i++)
         machine_pq.push(i);
-    request(0, 1, u0);
+    request(0, 1, url);
 }
 
 void tryGrade(int t) // 300 채점 시도
@@ -114,15 +116,16 @@ int main()
     for (int i = 0; i < q; i++)
     {
         int query, t, p, id;
-        string url, u;
         cin >> query;
         if (query == 100)
         {
+            string url;
             cin >> n >> url;
             init(url);
         }
         else if (query == 200)
         {
+            string u;
             cin >> t >> p >> u;
             request(t, p, u);
         }
@@ -136,7 +139,7 @@ int main()
             cin >> t >> id;
             endGrade(t, id);
         }
-        else
+        else if (query == 500)
         {
             cin >> t;
             printInfo(t);
