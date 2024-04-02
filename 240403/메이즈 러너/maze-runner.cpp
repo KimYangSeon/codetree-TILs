@@ -72,6 +72,7 @@ void tryMove()
             if (d.first == exitX && d.second == exitY)
             { // 탈출
                 pStat[i] = 0;
+                pBoard[d.first][d.second].erase(i);
                 //cout << i << "escape\n";
                 cnt--;
             }
@@ -168,9 +169,11 @@ void rotate()
                 board[i][j] = temp[i][j];
 
             pBoard[i][j] = tempSet[i][j];
+            for (auto t : pBoard[i][j]) p[t] = {i, j}; 
+                
+            
 
-            for (auto t : tempSet[i][j])
-                p[t] = {i, j};
+  
 
             if (board[i][j] == 100)
                 exitX = i, exitY = j;
@@ -186,14 +189,16 @@ void simulate()
     // 참가자 이동
     tryMove();
 
+    if(cnt==0) return;
+
     // 회전
     rotate();
 }
 
 int main()
 {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
+    //ios::sync_with_stdio(0);
+    //cin.tie(0);
 
     cin >> n >> m >> k;
     cnt = m;
@@ -216,7 +221,6 @@ int main()
     for (int i = 0; i < k && cnt > 0; i++)
     {
         simulate();
-
         //printPos();
     }
 
