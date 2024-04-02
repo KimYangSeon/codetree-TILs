@@ -23,13 +23,14 @@ void printPos()
         cout << '\n';
     }
 
+    /*
     for (int i = 0; i < m; i++)
     {
         if (pStat[i])
         {
             cout << i << ": " << p[i].first << ' ' << p[i].second << '\n';
         }
-    }
+    }*/
 }
 
 void tryMove()
@@ -66,14 +67,15 @@ void tryMove()
             pBoard[x][y].erase(i);
             p[i] = d; // 움직임
             pBoard[d.first][d.second].insert(i);
-
-            //cout << i << ": " << p[i].first << ' ' << p[i].second << '\n';
             ans++;
+
+            //cout << i << ": " << p[i].first << ' ' << p[i].second << ' ' << ans << '\n';
+            
             if (d.first == exitX && d.second == exitY)
             { // 탈출
                 pStat[i] = 0;
                 pBoard[d.first][d.second].erase(i);
-                //cout << i << "escape\n";
+                //cout << i << " escape\n";
                 cnt--;
             }
             break;
@@ -132,12 +134,14 @@ void rotate()
         {
             curSquarePos = getMinSquare(p[i].first, p[i].second, width);
 
-            if (curSquarePos.first < squarePos.first && curSquarePos.second < squarePos.second)
+            if (curSquarePos.first < squarePos.first)
+                squarePos = curSquarePos;
+            else if(curSquarePos.first == squarePos.first && curSquarePos.second < squarePos.second)
                 squarePos = curSquarePos;
         }
     }
 
-    // cout << "square: " << squarePos.first << ' ' << squarePos.second << ' ' << minWidth << '\n';
+    //cout << "square: " << squarePos.first << ' ' << squarePos.second << ' ' << minWidth << '\n';
 
     int temp[11][11];
     set<int> tempSet[11][11];
@@ -169,11 +173,11 @@ void rotate()
                 board[i][j] = temp[i][j];
 
             pBoard[i][j] = tempSet[i][j];
-            for (auto t : pBoard[i][j]) p[t] = {i, j}; 
+            for (auto t : pBoard[i][j]) {
+                p[t] = {i, j}; 
+                //cout << t << " rotate : " << i << ' ' << j << '\n';
+            }
                 
-            
-
-  
 
             if (board[i][j] == 100)
                 exitX = i, exitY = j;
@@ -221,8 +225,10 @@ int main()
     for (int i = 0; i < k && cnt > 0; i++)
     {
         simulate();
-        //printPos();
+       // printPos();
     }
+
+    //printPos();
 
     cout << ans << '\n'
          << exitX << ' ' << exitY;
