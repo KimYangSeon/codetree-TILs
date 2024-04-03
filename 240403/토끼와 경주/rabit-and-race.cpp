@@ -10,8 +10,7 @@ struct Rabbit
     int x;
     int y;
     int pid;
-    long long d;
-    long long score;
+    int d;
     int jCnt;
     int idx;
 };
@@ -35,6 +34,7 @@ struct cmp
 int q, n, m, p, cnt, round;
 int board[100001];
 int selected[2001];
+long long score[2001];
 Rabbit rabbit[2001];
 map<int, int> pidToRabbit;
 priority_queue<Rabbit, vector<Rabbit>, cmp> pq;
@@ -67,7 +67,7 @@ void init(int pid, long long d)
     rabbit[cnt].y = 1;
     rabbit[cnt].pid = pid;
     rabbit[cnt].d = d;
-    rabbit[cnt].score = 0;
+    score[cnt] = 0;
     rabbit[cnt].jCnt = 0;
     rabbit[cnt].idx = cnt;
     pidToRabbit[pid] = cnt;
@@ -79,9 +79,9 @@ pair<int, int> move(int idx, int dir)
 {
     int x = rabbit[idx].x;
     int y = rabbit[idx].y;
-    long long d = rabbit[idx].d;
+    int d = rabbit[idx].d;
 
-    long long mod;
+     int mod;
     int nx = x, ny = y;
     if (dir == 0)
     { // 상
@@ -136,7 +136,6 @@ void startRace(int k, int s)
     round++;
     for (int i = 0; i < k; i++)
     {
-        //cout << "-----" << i << "----------\n";
         int idx = pq.top().idx;
         pq.pop();
         vector<pair<int, int>> v;
@@ -144,21 +143,19 @@ void startRace(int k, int s)
         for (int dir = 0; dir < 4; dir++)
             v.push_back(move(idx, dir));
         sort(v.begin(), v.end(), cmp3);
+
         // 토끼 이동
-        //cout << rabbit[idx].pid << " move: " << rabbit[idx].x << ' ' <<rabbit[idx].y << " -> ";
         rabbit[idx].x = v[0].first;
         rabbit[idx].y = v[0].second;
         rabbit[idx].jCnt++;
         selected[idx] = round;
-        //cout << rabbit[idx].x << ' ' <<rabbit[idx].y << '\n';
 
         // 나머지 토끼 점수 획득
         for (int j = 0; j < cnt; j++)
         {
             if (j == idx)
                 continue;
-            rabbit[j].score += (rabbit[idx].x + rabbit[idx].y);
-            //cout << rabbit[j].pid << ": " << rabbit[j].score << '\n';
+            score[j] += (rabbit[idx].x + rabbit[idx].y);
         }
         pq.push(rabbit[idx]);
     }
@@ -172,11 +169,9 @@ void startRace(int k, int s)
 
     for(auto v : v2){
         if(selected[v.idx] != round) continue;
-        rabbit[v.idx].score += s;
+        score[v.idx] += s;
         break;
     }
-    
-    //cout << rabbit[idx].pid << ": " << rabbit[idx].score << '\n';
 }
 
 void changeD(int pid, long long l)
@@ -190,8 +185,8 @@ void printMaxScore()
     long long maxScore = -1;
     for (int i = 0; i < cnt; i++)
     {
-        if (rabbit[i].score > maxScore)
-            maxScore = rabbit[i].score;
+        if (score[i] > maxScore)
+            maxScore = score[i];
     }
     cout << maxScore;
 }
@@ -211,20 +206,20 @@ int main()
             cin >> n >> m >> p;
             for (int j = 0; j < p; j++)
             {
-                long long pid, d;
+                int pid, d;
                 cin >> pid >> d;
                 init(pid, d);
             }
         }
         else if (query == 200)
         {
-            long long k, s;
+            int k, s;
             cin >> k >> s;
             startRace(k, s);
         }
         else if (query == 300)
         {
-            long long pid, l;
+            int pid, l;
             cin >> pid >> l;
             changeD(pid, l);
         }
