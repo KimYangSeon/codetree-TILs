@@ -10,8 +10,8 @@ struct Rabbit
     int x;
     int y;
     int pid;
-    int d;
-    int score;
+    long long d;
+    long long score;
     int jCnt;
     int idx;
 };
@@ -32,6 +32,14 @@ struct cmp
     }
 };
 
+int q, n, m, p, cnt, round;
+int board[100001];
+int selected[2001];
+Rabbit rabbit[2001];
+map<int, int> pidToRabbit;
+priority_queue<Rabbit, vector<Rabbit>, cmp> pq;
+
+
 bool cmp2(Rabbit &a, Rabbit &b)
 {
     if (a.x + a.y != b.x + b.y)
@@ -43,12 +51,6 @@ bool cmp2(Rabbit &a, Rabbit &b)
     return a.pid > b.pid;
 };
 
-int q, n, m, p, cnt;
-int board[100001];
-Rabbit rabbit[2001];
-map<int, int> pidToRabbit;
-priority_queue<Rabbit, vector<Rabbit>, cmp> pq;
-
 bool cmp3(pair<int, int> a, pair<int, int> b)
 {
     if (a.first + a.second != b.first + b.second)
@@ -59,7 +61,7 @@ bool cmp3(pair<int, int> a, pair<int, int> b)
         return a.second > b.second;
 }
 
-void init(int pid, int d)
+void init(int pid, long long d)
 {
     rabbit[cnt].x = 1;
     rabbit[cnt].y = 1;
@@ -77,9 +79,9 @@ pair<int, int> move(int idx, int dir)
 {
     int x = rabbit[idx].x;
     int y = rabbit[idx].y;
-    int d = rabbit[idx].d;
+    long long d = rabbit[idx].d;
 
-    int mod;
+    long long mod;
     int nx = x, ny = y;
     if (dir == 0)
     { // 상
@@ -131,6 +133,7 @@ pair<int, int> move(int idx, int dir)
 
 void startRace(int k, int s)
 {
+    round++;
     for (int i = 0; i < k; i++)
     {
         //cout << "-----" << i << "----------\n";
@@ -146,6 +149,7 @@ void startRace(int k, int s)
         rabbit[idx].x = v[0].first;
         rabbit[idx].y = v[0].second;
         rabbit[idx].jCnt++;
+        selected[idx] = round;
         //cout << rabbit[idx].x << ' ' <<rabbit[idx].y << '\n';
 
         // 나머지 토끼 점수 획득
@@ -166,12 +170,16 @@ void startRace(int k, int s)
         v2.push_back(rabbit[i]);
     sort(v2.begin(), v2.end(), cmp2);
 
-    int idx = v2[0].idx;
-    rabbit[idx].score += s;
+    for(auto v : v2){
+        if(selected[v.idx] != round) continue;
+        rabbit[v.idx].score += s;
+        break;
+    }
+    
     //cout << rabbit[idx].pid << ": " << rabbit[idx].score << '\n';
 }
 
-void changeD(int pid, int l)
+void changeD(int pid, long long l)
 {
     int idx = pidToRabbit[pid];
     rabbit[idx].d *= l;
@@ -179,7 +187,7 @@ void changeD(int pid, int l)
 
 void printMaxScore()
 {
-    int maxScore = -1;
+    long long maxScore = -1;
     for (int i = 0; i < cnt; i++)
     {
         if (rabbit[i].score > maxScore)
@@ -203,20 +211,20 @@ int main()
             cin >> n >> m >> p;
             for (int j = 0; j < p; j++)
             {
-                int pid, d;
+                long long pid, d;
                 cin >> pid >> d;
                 init(pid, d);
             }
         }
         else if (query == 200)
         {
-            int k, s;
+            long long k, s;
             cin >> k >> s;
             startRace(k, s);
         }
         else if (query == 300)
         {
-            int pid, l;
+            long long pid, l;
             cin >> pid >> l;
             changeD(pid, l);
         }
