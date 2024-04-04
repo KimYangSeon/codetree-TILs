@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <tuple>
 using namespace std;
 
 int n, m, t, cnt;
@@ -28,20 +29,29 @@ void FindBase(int p)
     if(p > m) return;
     // p번 편의점과 가장 가까운 베이스캠프 찾기
 
-    queue<pair<int, int>> q;
+    queue<tuple<int, int, int>> q;
     vector<pair<int, int>> basePos;
     pair<int, int> closest;
-    q.push(storePos[p]); // 시작지점: p번 편의점
+    q.push({storePos[p].first, storePos[p].second, 0}); // 시작지점: p번 편의점
     vis[storePos[p].first][storePos[p].second][p] = t;
     bool isFound = false;
-    while (!isFound)
+    int minDist = 15*15+1;
+    while (!isFound && !q.empty())
     {
         auto cur = q.front();
         q.pop();
+
         for (int dir = 0; dir < 4; dir++)
         {
-            int nx = cur.first + dx[dir];
-            int ny = cur.second + dy[dir];
+            int nx,ny,nDist;
+            tie(nx,ny,nDist) = cur;
+            nx += dx[dir];
+            ny += dy[dir];
+            nDist++;
+            if(nDist > minDist){
+                isFound = true;
+                break;
+            } 
             if (nx < 1 || nx > n || ny < 1 || ny > n)
                 continue;
             if (vis[nx][ny][p] == t || board[nx][ny] == -1)
@@ -50,12 +60,14 @@ void FindBase(int p)
             vis[nx][ny][p] = t;
             if (board[nx][ny] == 100)
             { // 베이스캠프 찾음
-                isFound = true;
+                minDist = nDist;
+                //isFound = true;
+                //cout << nx << ' ' << ny << '\n';
                 basePos.push_back({nx, ny});
             }
             else
             {
-                q.push({nx, ny});
+                q.push({nx, ny, nDist});
             }
         }
     }
@@ -73,7 +85,7 @@ void FindBase(int p)
     }
     curPos[p] = closest; // 베이스캠프로 이동
     board[closest.first][closest.second] = -1; // 해당 칸을 지나갈 수 없어짐
-    //cout << "base: " << closest.first << ' ' << closest.second << '\n';
+    //cout << p << " base: " << closest.first << ' ' << closest.second << '\n';
 }
 
 void FindStore(int p)
@@ -119,7 +131,7 @@ void FindStore(int p)
         if(temp2 == curPos[p]) break;
         temp = temp2;
     }
-    //cout << temp.first << ' ' << temp.second << '\n';
+    //cout << p << ": " << temp.first << ' ' << temp.second << '\n';
 
     curPos[p] = temp; // 이동
     if(curPos[p] == storePos[p]){
