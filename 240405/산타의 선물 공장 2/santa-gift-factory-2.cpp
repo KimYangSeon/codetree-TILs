@@ -7,7 +7,6 @@ list<int> belt[100001];
 int present_front[100001];
 int present_back[100001];
 int cnt[100001];
-// int belt_back[100001];
 
 void init(int b, int p)
 {
@@ -19,7 +18,6 @@ void init(int b, int p)
 
     belt[b].push_back(p);
     cnt[b]++; // 벨트의 선물 개수
-    // belt_back[b] = p; // 벨트의 맨 뒤
 }
 
 void MoveAll(int src, int dst)
@@ -36,7 +34,7 @@ void MoveAll(int src, int dst)
         }
         belt[dst].splice(belt[dst].begin(), belt[src]);
     }
-   
+
     cnt[dst] += cnt[src];
     cnt[src] = 0;
     belt[src].clear();
@@ -44,22 +42,54 @@ void MoveAll(int src, int dst)
     cout << cnt[dst] << '\n';
 }
 
+int PopPresent(int b)
+{
+    if(cnt[b]==0) return 0;
+    int num = belt[b].front();
+    belt[b].pop_front();
+    cnt[b]--;
+    present_back[num] = 0;
+
+    if (cnt[b] > 0)
+        present_front[belt[b].front()] = 0;
+
+    return num;
+}
+
+void PushPresent(int p, int b)
+{
+    if(cnt[b] > 0){
+        present_front[belt[b].front()] = p;
+        present_back[p] = belt[b].front();
+    }
+    belt[b].push_front(p);
+    cnt[b]++;
+}
+
 void ChangeFront(int src, int dst)
 {
-    int sp, dp;
-
+    int sp=0, dp=0;
+    sp = PopPresent(src);
+    dp = PopPresent(dst);
+    /*
     if (cnt[src] > 0)
     {
-        sp = belt[src].front();
-        belt[src].pop_front();
+        //sp = belt[src].front();
+        //belt[src].pop_front();
+        sp = PopPresent(src);
     }
 
     if (cnt[dst] > 0)
     {
-        dp = belt[dst].front();
-        belt[dst].pop_front();
+        //dp = belt[dst].front();
+        //belt[dst].pop_front();
+        dp = PopPresent(dst);
     }
+    */
 
+    if(dp!=0) PushPresent(dp,src);
+    if(sp!=0) PushPresent(sp,dst);
+/*
     if (cnt[src] > 0 && cnt[dst] > 0)
     {
         if (cnt[src] > 1 && cnt[dst] > 1) // dst, src에 선물이 2개 이상 있었음
@@ -108,7 +138,7 @@ void ChangeFront(int src, int dst)
 
         belt[src].push_front(dp);
     }
-
+*/
     cout << cnt[dst] << '\n';
 }
 
@@ -126,7 +156,8 @@ void DivedePresent(int src, int dst)
             present_back[sp] = dp;  // src 선물의 뒤 = dst 앞 선물
             present_front[dp] = sp; // dst 선물의 앞 = src 선물
         }
-        else{
+        else
+        {
             present_back[sp] = 0; // src 선물의 뒤에 아무것도 없음
         }
 
@@ -139,9 +170,7 @@ void DivedePresent(int src, int dst)
 
         if (cnt[src] > 0)
             present_front[belt[src].front()] = 0; // src에 남아있는 맨앞 선물의 앞 선물 바꿈
-
     }
-
 
     cout << cnt[dst] << '\n';
 }
@@ -150,7 +179,7 @@ void PresentInfo(int p)
 {
     int a = present_front[p] == 0 ? -1 : present_front[p];
     int b = present_back[p] == 0 ? -1 : present_back[p];
-    //cout << p << " : " << a << ' ' << b << '\n';
+    // cout << p << " : " << a << ' ' << b << '\n';
     cout << a + 2 * b << '\n';
 }
 
@@ -198,7 +227,7 @@ int main()
         {
             int m_src, m_dst;
             cin >> m_src >> m_dst;
-            DivedePresent(m_src,m_dst);
+            DivedePresent(m_src, m_dst);
         }
         else if (query == 500)
         {
@@ -213,7 +242,7 @@ int main()
             BeltInfo(b_num);
         }
 
-        //for(int j=1; j<=m; j++) PresentInfo(j);
+        // for(int j=1; j<=m; j++) PresentInfo(j);
     }
 
     // for(int i=1; i<=n; i++) cout << cnt[i] << ' ';
