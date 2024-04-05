@@ -31,16 +31,14 @@ void MoveAll(int src, int dst)
         if (cnt[dst] > 0)
         {
             int dp = belt[dst].front();
-            //cout << dp << "??????";
             present_back[sp] = dp;  // src 맨뒤 선물의 뒤 = dst 맨앞 선물
             present_front[dp] = sp; // dst 맨앞 선물의 앞 = src 맨뒤 선물
         }
+        belt[dst].splice(belt[dst].begin(), belt[src]);
     }
-    belt[dst].splice(belt[dst].begin(), belt[src]);
-
+   
     cnt[dst] += cnt[src];
     cnt[src] = 0;
-    // belt_back[src] = 0;
     belt[src].clear();
 
     cout << cnt[dst] << '\n';
@@ -94,7 +92,7 @@ void ChangeFront(int src, int dst)
         cnt[dst]++;
 
         present_back[sp] = 0;
-        if (cnt[src] > 1)
+        if (cnt[src] >= 1)
             present_front[belt[src].front()] = 0;
 
         belt[dst].push_front(sp);
@@ -105,7 +103,7 @@ void ChangeFront(int src, int dst)
         cnt[dst]--;
 
         present_back[dp] = 0;
-        if (cnt[dst] > 1)
+        if (cnt[dst] >= 1)
             present_front[belt[dst].front()] = 0;
 
         belt[src].push_front(dp);
