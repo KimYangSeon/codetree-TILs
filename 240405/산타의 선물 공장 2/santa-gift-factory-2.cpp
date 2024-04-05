@@ -119,10 +119,9 @@ void DivedePresent(int src, int dst)
     if (cnt[src] > 1)
     {
         auto iter = belt[src].begin();
-        advance(iter, cnt[src] / 2-1); // n/2 번째 선물 가리킴
-
+        advance(iter, (cnt[src] / 2) - 1); // n/2 번째 선물 가리킴
         int sp = *iter;
-        //cout << cnt[src] / 2 << "?????\n";
+
         if (cnt[dst] > 0)
         {
             int dp = belt[dst].front();
@@ -139,11 +138,10 @@ void DivedePresent(int src, int dst)
 
         cnt[dst] += cnt[src] / 2;
         cnt[src] -= cnt[src] / 2;
-        //cout << belt[dst].front()  << ' ' << belt[dst].back()<<"???";
+
         if (cnt[src] > 0)
             present_front[belt[src].front()] = 0; // src에 남아있는 맨앞 선물의 앞 선물 바꿈
-        // belt_back[src] = 0;
-        // belt[src].clear();
+
     }
 
 
