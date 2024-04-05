@@ -72,15 +72,17 @@ void ChangeFront(int src, int dst)
             present_back[sp] = belt[dst].front();
             present_back[dp] = belt[src].front();
         }
-        else if (cnt[src] > 1 && cnt[dst] <= 1)
+        else if (cnt[src] > 1 && cnt[dst] == 1)
         { // dst에 한개밖에 없었을 때
             present_front[belt[src].front()] = dp;
             present_back[dp] = belt[src].front();
+            present_back[sp] = 0;
         }
-        else if (cnt[src] <= 1 && cnt[dst] > 1)
+        else if (cnt[src] == 1 && cnt[dst] > 1)
         { // src에 한개밖에 없었을 때
             present_front[belt[dst].front()] = sp;
             present_back[sp] = belt[dst].front();
+            present_back[dp] = 0;
         }
 
         belt[dst].push_front(sp);
@@ -109,13 +111,6 @@ void ChangeFront(int src, int dst)
         belt[src].push_front(dp);
     }
 
-    // 벨트에 선물이 한 개 -> 벨트의 맨 뒤 선물 갱신
-    /*
-    if (cnt[dst] == 1)
-        belt_back[dst] = belt[dst].front();
-    if (cnt[src] == 1)
-        belt_back[src] = belt[src].front();
-    */
     cout << cnt[dst] << '\n';
 }
 
