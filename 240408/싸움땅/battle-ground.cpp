@@ -16,7 +16,6 @@ int round;
 
 bool isWin(int p1, int p2)
 {
-
     int p1Stat = playerStat[p1] + gun[p1];
     int p2Stat = playerStat[p2] + gun[p2];
 
@@ -40,16 +39,16 @@ void CheckGun(int p, int x, int y)
     {
         gun[p] = gunPq[x][y].top();
         gunPq[x][y].pop();
+        //cout << p << " gun: " << gun[p] << '\n';
     }
-    else if (gun[p] < gunPq[x][y].top())
+    else if (gun[p] != 0 && gun[p] < gunPq[x][y].top())
     {
         int temp = gun[p];          // 들고 있던 총
         gun[p] = gunPq[x][y].top(); // 새 총
         gunPq[x][y].pop();
         gunPq[x][y].push(temp);
+        //cout << p << " gun: " << gun[p] << '\n';
     }
-
-    // cout << "gun: " << p << ' ' << gun[p] << '\n';
 }
 
 void Move2(int p)
@@ -57,27 +56,27 @@ void Move2(int p)
     auto cur = playerPos[p];
     int nx;
     int ny;
-    // cout << p << " dir: " << playerDir[p] << '\n';
+    //cout << p << " cur D: " << playerDir[p] << '\n';
+    playerDir[p]--;
     for (int dir = 0; dir < 4; dir++)
     { // 오른쪽으로 90도씩 회전하여 빈 칸이 보이는 순간 이동
-        playerDir[p] = (playerDir[p] + dir) % 4;
+        playerDir[p] = (playerDir[p] + 1) % 4;
+        //cout << playerDir[p] << ' ';
         nx = cur.first + dx[playerDir[p]];
         ny = cur.second + dy[playerDir[p]];
         if (nx < 0 || nx >= n || ny < 0 || ny >= n)
             continue;
         if (pBoard[nx][ny] != 0)
-        {
-            // cout << nx << ' ' << ny << ' ' << pBoard[nx][ny] << "?\n";
             continue;
-        }
-
         break;
     }
-    pBoard[cur.first][cur.second] = 0;
+    //cout << pBoard[1][1] << "? ";
+    //cout << p << " new D: " << playerDir[p] << '\n';
+    
     pBoard[nx][ny] = p;
     playerPos[p] = {nx, ny};
 
-    // cout << p << " lose move: " << nx << ' ' << ny << '\n';
+    //cout << p << " lose move: " << nx << ' ' << ny << '\n';
 
     CheckGun(p, nx, ny);
 }
@@ -87,21 +86,21 @@ void Move(int p)
     pBoard[cur.first][cur.second] = 0;
     int nx = cur.first + dx[playerDir[p]];
     int ny = cur.second + dy[playerDir[p]];
-    if (nx < 0 || nx >= n || ny < 0 || ny >= n)
+    if (nx < 0 || nx >= n || ny < 0 || ny >= n) // 반대방향
     {
         playerDir[p] = (playerDir[p] + 2) % 4;
         nx = cur.first + dx[playerDir[p]];
         ny = cur.second + dy[playerDir[p]];
     }
 
-    // cout << "move: " << p << ' ' << nx << ' ' << ny << '\n';
+    playerPos[p] = {nx, ny};
+    //cout << p << " move: " << nx << ' ' << ny << '\n';
+
 
     if (pBoard[nx][ny] == 0)
     { // 이동한 방향에 플레이어가 없다면
-        // cout << "!";
         CheckGun(p, nx, ny);
         pBoard[nx][ny] = p;
-        playerPos[p] = {nx, ny};
     }
     else
     { // 싸움
@@ -117,18 +116,21 @@ void Move(int p)
             lose = p;
         }
 
-        // cout << "win: " << win << '\n';
+       // cout << "win: " << win << '\n';
 
         score[win] += (playerStat[win] + gun[win]) - (playerStat[lose] + gun[lose]);
-        // 원래 놓여있던 총이랑 진 사람이 내려놓은 총 중에 쎈거 골라야 함
+
+        pBoard[nx][ny] = win;
+        playerPos[win] = {nx, ny};
         playerPos[lose] = {nx, ny};
-        gunPq[nx][ny].push(gun[lose]); // 진 플레이어 총 내려놓음
-        gun[lose] = 0;
+        if(gun[lose]!=0){
+            gunPq[nx][ny].push(gun[lose]); // 진 플레이어 총 내려놓음
+            gun[lose] = 0;
+        }
+        //cout << playerDir[2] << '\n';
         Move2(lose);
 
-        pBoard[nx][ny] = p;
-        playerPos[p] = {nx, ny};
-
+        // 이긴 사람 총 선택
         CheckGun(win, nx, ny);
     }
 }
@@ -172,6 +174,23 @@ int main()
     {
         Simulate();
         round++;
+        /*
+        cout << "------------------------\n";
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                cout << pBoard[i][j] << ' ';
+            }
+            cout << '\n';
+        }
+
+        cout << "------------------------\n";
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                cout << gunPq[i][j].size() << ' ';
+            }
+            cout << '\n';
+        }*/
+        
     }
     for (int p = 1; p <= m; p++)
         cout << score[p] << ' ';
